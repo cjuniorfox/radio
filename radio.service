@@ -1,0 +1,9 @@
+[Unit]
+Description=Small radio automatization script
+
+[Service]
+ExecStart=/srv/media/radio/radio.sh
+ExecStop=kill -9 `cat /tmp/radio.pid` && rm /tmp/radio.pid
+
+[Install]
+WantedBy=multi-user.target

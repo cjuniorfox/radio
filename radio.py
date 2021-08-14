@@ -39,8 +39,6 @@ while ( 0 < 1 ): #infinite loop
         music_files.append(file_name)
     random.shuffle(music_files)
 
-    print("Files and directories in a specified path")
-
     for filename in music_files:
         vozdobrasil()
         f=os.path.join(path,filename)
