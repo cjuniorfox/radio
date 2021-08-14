@@ -2,8 +2,28 @@ import os
 import random
 import subprocess
 import sqlite3
+import requests
+import re
+from datetime import datetime
+from datetime import timedelta
 
+downloadvozdobrasil = "https://redenacionalderadio.com.br/programas/a-voz-do-brasil-download"
 path='/srv/media/radio/music'
+
+def vozdobrasil():
+    if datetime.today().weekday() in range(0,4) and datetime.now().strftime("%H")=="21": #Verifica se eh dia util e a hora
+        print("Voz do brasil")
+        today=datetime.today() - timedelta(1)
+        strtoday=today.strftime("%d-%m-%y")
+        resp = requests.get(downloadvozdobrasil)
+        lines = resp.content.split("\n")
+        for line in lines:
+            if re.search(strtoday,line):
+                vozlink=line.split("\"")[1]
+                print(vozlink)
+                if vozlink is not None:
+                    subprocess.call(["omxplayer",vozlink])
+
 con= sqlite3.connect("radio.db")
 c = con.cursor();
 #Check for creation of database
@@ -22,15 +42,19 @@ while ( 0 < 1 ): #infinite loop
     print("Files and directories in a specified path")
 
     for filename in music_files:
+        vozdobrasil()
         f=os.path.join(path,filename)
         if os.path.isfile(f):
             print(f)
             c = con.cursor()
             c.execute("SELECT plays from music_played where song_name = ?", (f,))
-            if c.fetchone() is None:
+            song=c.fetchone()
+            if song is None:
                 print("inserindo")
                 c.execute("INSERT INTO music_played (song_name,plays,date_played) values (?,?,current_timestamp)",(f,1))
             else:
-                c.execute("UPDATE music_played set (plays=plays+1,date_played=current_timestamp) where song_name=?"(f))
+                #Verifica se musica foi menos tocada que as demais da radio
+                print("atualizando")
+                c.execute("UPDATE music_played set plays=plays+1,date_played=current_timestamp where song_name=?",(f,))
             con.commit()
-            # subprocess.call(["omxplayer",f])
+            subprocess.call(["omxplayer","-o","local",f])
