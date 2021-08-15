@@ -39,20 +39,18 @@ while ( 0 < 1 ): #infinite loop
         music_files.append(file_name)
     random.shuffle(music_files)
 
-    for filename in music_files:
+    for song in music_files:
         vozdobrasil()
-        f=os.path.join(path,filename)
+        f=os.path.join(path,song)
         if os.path.isfile(f):
-            print(f)
+            print(song)
             c = con.cursor()
-            c.execute("SELECT plays from music_played where song_name = ?", (f,))
-            song=c.fetchone()
-            if song is None:
-                print("inserindo")
-                c.execute("INSERT INTO music_played (song_name,plays,date_played) values (?,?,current_timestamp)",(f,1))
+            c.execute("SELECT plays from music_played where song_name = ?", (song.decode('utf-8'),))
+            result=c.fetchone()
+            if result is None:
+                c.execute("INSERT INTO music_played (song_name,plays,date_played) values (?,?,current_timestamp)",(song.decode('utf-8'),1))
             else:
                 #Verifica se musica foi menos tocada que as demais da radio
-                print("atualizando")
-                c.execute("UPDATE music_played set plays=plays+1,date_played=current_timestamp where song_name=?",(f,))
+                c.execute("UPDATE music_played set plays=plays+1,date_played=current_timestamp where song_name=?",(song.decode('utf-8'),))
             con.commit()
-            subprocess.call(["omxplayer","-o","local",f])
+        #subprocess.call(["omxplayer","-o","alsa",f])
