@@ -1,5 +1,7 @@
 [Unit]
 Description=Small radio automatization script
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 ExecStart=/srv/media/radio/radio.sh

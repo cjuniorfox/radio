@@ -1,0 +1,9 @@
+[Unit]
+Description=RDS update script
+Wants=fm.service
+[Service]
+ExecStart=/srv/media/radio/rds_song.sh
+ExecStop=kill -9 `cat /tmp/rds_song.pid` && rm /tmp/rds_song.pid
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+[Unit]
+Description=FM exiter
+
+[Service]
+ExecStart=/srv/media/radio/fm.sh
+ExecStop=kill -9 `cat /tmp/fm.pid` && rm /tmp/fm.pid
+
+[Install]
+WantedBy=multi-user.target
