@@ -35,7 +35,7 @@ while(True):
 	f=open(rds_ctl,"w")
 	if(last_song != song_name):
 		last_song=song_name
-		print(song_name)
+		print(song_name.encode("UTF-8"))
 		f.write("RT "+song_name.upper())
 	else:
 		f.write("PS "+marquee)

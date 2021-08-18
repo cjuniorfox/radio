@@ -26,7 +26,7 @@ def play(media,song_name):
         reg_song_name(song_name)
     except E:
         print("Unable to update song run")
-    subprocess.call(["omxplayer","-o","alsa:hw:0,1",media])
+    subprocess.call(["omxplayer","--no-keys","--no-osd","-o","alsa:hw:0,1",media])
 
 def vozdobrasil():
     if datetime.today().weekday() in range(0,4) and datetime.now().strftime("%H")=="21": #Verifica se eh dia util e a hora
