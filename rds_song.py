@@ -15,7 +15,7 @@ jump=2
 sleep=4
 #completa texto com marquee de final
 length = len(texto)
-texto=texto+"   "
+texto=texto+"  "
 for x in range(size):
 	texto=texto+texto[x]
 
@@ -35,9 +35,10 @@ while(True):
 	f=open(rds_ctl,"w")
 	if(last_song != song_name):
 		last_song=song_name
-		print(song_name.encode("UTF-8"))
-		f.write("RT "+song_name.upper())
+		command = "RT "+song_name.encode("UTF-8").upper() 
+		f.write(command)
 	else:
-		f.write("PS "+marquee)
+		command = "PS "+marquee
+		f.write(command)
 	f.close()
 	time.sleep(sleep)
