@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import os
 import sqlite3
 import time
@@ -5,6 +6,7 @@ import tempfile
 
 #tmpdir = tempfile.mkdtemp()
 rds_ctl = os.path.join('/tmp','rds_ctl')
+dbpath="/srv/media/radio"
 print(rds_ctl)
 last_song=''
 
@@ -20,7 +22,7 @@ for x in range(size):
 	texto=texto+texto[x]
 
 while(True):
-	con=sqlite3.connect("radio.db")
+	con=sqlite3.connect(os.path.join(dbpath,"radio.db"))
 	cur=con.cursor()
 	cur.execute("SELECT song_name from music_played order by date_played desc")
 	song_name=cur.fetchone()[0]

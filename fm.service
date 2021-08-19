@@ -1,9 +1,8 @@
 [Unit]
-Description=FM exiter
+Description=FM Exiter
 
 [Service]
-ExecStart=/srv/media/radio/fm.sh
-ExecStop=kill -9 `cat /tmp/fm.pid` && rm /tmp/fm.pid
+ExecStart=/srv/media/radio/fm.py
 
 [Install]
 WantedBy=multi-user.target

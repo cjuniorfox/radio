@@ -4,8 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/srv/media/radio/radio.sh
-ExecStop=kill -9 `cat /tmp/radio.pid` && rm /tmp/radio.pid
+ExecStart=/srv/media/radio/radio.py
 
 [Install]
 WantedBy=multi-user.target

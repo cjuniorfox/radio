@@ -9,6 +9,7 @@ from datetime import datetime
 
 downloadvozdobrasil = "https://redenacionalderadio.com.br/programas/a-voz-do-brasil-download"
 path="/srv/media/radio/music"
+dbpath="/srv/media/radio"
 audiohw="hw:0,1"
 filtercomplex="compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5"
 def reg_song_name(song_name):
@@ -61,7 +62,7 @@ def vozdobrasil():
                         playffmpeg(vozlink,"Voz do Brasil")
         except Exception:
             print('Unable to reach the internet') 
-con= sqlite3.connect("radio.db")
+con= sqlite3.connect(os.path.join(dbpath,"radio.db"))
 c = con.cursor();
 #Check for creation of database
 c.execute(" SELECT count(name) FROM sqlite_master WHERE type='table' AND name='music_played' ")
@@ -81,5 +82,4 @@ while ( 0 < 1 ): #infinite loop
 	song_name = song.decode('utf-8').replace('.m4a','').replace('.mp3','')
         f=os.path.join(path,song)
         if os.path.isfile(f):
-            #print(song_name)
             playffmpeg(f,song_name)
