@@ -36,11 +36,12 @@ while(True):
 	c=c+jump	
 	f=open(rds_ctl,"w")
 	if(last_song != song_name):
-		last_song=song_name
-		command = "RT "+song_name.encode("UTF-8").upper() 
-		f.write(command)
+	    last_song=song_name
+	    command = "RT "+song_name.encode("UTF-8").upper() 
+	    f.write(command)
 	else:
-		command = "PS "+marquee
-		f.write(command)
+	    command = "PS "+marquee
+	    f.write(command)
+        print(command)
 	f.close()
 	time.sleep(sleep)

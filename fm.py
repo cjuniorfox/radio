@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import stat
 import subprocess
 import tempfile
 import time
@@ -10,19 +11,28 @@ freq="91.5"
 ps="VROCK FM"
 rt="RADIOVROCK FM"
 fm=None
-
+sleeptime=7200
+usehw=False
+broadfifo=os.path.join("/tmp","broadcast")
 #tmpdir = tempfile.mkdtemp()
 rds_ctl = os.path.join('/tmp','rds_ctl')
 subprocess.Popen(["mkfifo",rds_ctl])
 
 
 def startfm():
+    inputbroadcast = "-" #Imput for pi_fm_adv. If hardware is true, the input is piped from arecord
     arecord=["arecord", "-fS16_LE", "-r", "44100", "-Dplughw:0,0", "-c", "2", "-", "--quiet"]
-    pifmadv=["pi_fm_adv","--wait","0","--ps", ps,"--freq" , freq, "--audio", "-", "--ctl", rds_ctl,"--rt",rt,"--mpx","40","--preemph","us"]
     time.sleep(0.3)
-    rec = subprocess.Popen(arecord,stdout=subprocess.PIPE)
-    fm = subprocess.Popen(pifmadv, stdin=rec.stdout, stdout=subprocess.PIPE)
-    rec.stdout.close()
+    pifmadv=["pi_fm_adv","--wait","0","--ps", ps,"--freq" , freq, "--ctl", rds_ctl,"--rt",rt,"--mpx","40","--preemph","us","--audio"]
+    if usehw:
+        pifmadv.append("-")
+        rec = subprocess.Popen(arecord,stdout=subprocess.PIPE)
+        fm = subprocess.Popen(pifmadv, stdin=rec.stdout, stdout=subprocess.PIPE)
+        rec.stdout.close()
+    else:
+        subprocess.Popen(["mkfifo",broadfifo])
+        pifmadv.append(broadfifo)
+        fm = subprocess.Popen(pifmadv)
     return fm
 
 def stopfm(fm):
@@ -36,4 +46,4 @@ while(True):
     if fm is not None :
         stopfm(fm)
     fm = startfm()
-    time.sleep(1800)
+    time.sleep(sleeptime)

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+import stat
 import random
 import subprocess
 import sqlite3
@@ -13,7 +14,9 @@ downloadvozdobrasil = "https://redenacionalderadio.com.br/programas/a-voz-do-bra
 path="/srv/media/radio/music"
 dbpath="/srv/media/radio"
 audiohw="hw:0,1"
-filtercomplex="compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5"
+usehw=False #Define if the broadcast will use hardware (can be snd_aloop) or thought a fifo
+broadfifo='/tmp/broadcast' #Broadcast file (used only if usehw is false
+filtercomplex="compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5" #filter options for ffmpeg conversion
 
 def regsongname(song_name):
     c = con.cursor()
@@ -31,16 +34,24 @@ def playffmpeg(media,songname):
         regsongname(songname)
     except E:
         print("Unable to update song name")
-    cmdffmpeg = ["ffmpeg","-i",media,"-loglevel","error","-f","wav","-"];
+    cmdffmpeg = ["ffmpeg","-i",media,"-loglevel","error","-f","wav","-bitexact", "-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2","-"];
     if filtercomplex is not None:
         cmdffmpeg.append("-filter_complex")
         cmdffmpeg.append(filtercomplex)
-    print("["+datetime.today().strftime("%d/%M/%Y - %H:%m:%S"+"]")+" Song: "+songname.encode("UTF-8"))
+    print("["+datetime.today().strftime("%d/%m/%Y - %H:%M:%S"+"]")+" Song: "+songname.encode("UTF-8"))
     aplaycmd = ["aplay","-D",audiohw,"--quiet"]
-    psffmpeg = subprocess.Popen(cmdffmpeg,stdout=subprocess.PIPE)
-    psaplay = subprocess.Popen(aplaycmd,stdin=psffmpeg.stdout,stdout=subprocess.PIPE)
-    psffmpeg.stdout.close()
-    print(psaplay.communicate()[0])
+    if usehw: #If alsahw was used, pipe ffmpeg to aplay
+        psffmpeg = subprocess.Popen(cmdffmpeg,stdout=subprocess.PIPE)
+        psaplay = subprocess.Popen(aplaycmd,stdin=psffmpeg.stdout,stdout=subprocess.PIPE)
+        psffmpeg.stdout.close()
+        print(psaplay.communicate()[0])
+    else: #pipe ffmpeg to fifo
+        subprocess.Popen(["mkfifo",broadfifo])
+        broadcast = open(broadfifo,"w")
+        psffmpeg = subprocess.Popen(cmdffmpeg,stdout=broadcast)
+        psffmpeg.wait()
+    #psffmpeg.stdout.close()
+    #print(psaplay.communicate()[0])
     
 def vozdobrasil():
     if datetime.today().weekday() in range(0,4) and datetime.now().strftime("%H")=="21": #Verifica se eh dia util e a hora
