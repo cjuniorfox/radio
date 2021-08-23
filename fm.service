@@ -3,6 +3,8 @@ Description=FM Exiter
 
 [Service]
 ExecStart=/srv/media/radio/fm.py
+After=radio.service,rds_song.service
+Wants=radio.service
 
 [Install]
 WantedBy=multi-user.target

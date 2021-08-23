@@ -3,6 +3,6 @@ Description=RDS update script
 Wants=fm.service
 [Service]
 ExecStart=/srv/media/radio/rds_song.py
-
+Before=fm.service
 [Install]
 WantedBy=multi-user.target
