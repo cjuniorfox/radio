@@ -2,7 +2,7 @@
 Description=FM Exiter
 
 [Service]
-ExecStart=/srv/media/radio/fm.py
+ExecStart=fm
 After=radio.service,rds_song.service
 Wants=radio.service
 

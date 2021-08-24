@@ -6,7 +6,7 @@ from listfiles import listfiles
 audioext = ('.mp3','.m4a')
 downloadvozdobrasil = "https://redenacionalderadio.com.br/programas/a-voz-do-brasil-download"
 path="/srv/media/radio/music"
-dbpath="/srv/media/radio"
+dbpath="/var/opt/radio"
 hw="dmix:CARD=Loopback,DEV=0"
 overlap=3 #Overlap time between songs. Only available if not piping the output
 #Define if the broadcast will use hardware (can be snd_aloop) or thought a fifo

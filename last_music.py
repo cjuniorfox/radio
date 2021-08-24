@@ -2,7 +2,7 @@
 import os
 import sqlite3
 
-con=sqlite3.connect("radio.db")
+con=sqlite3.connect(os.path.join("/var/opt/radio","radio.db"))
 cur=con.cursor()
 cur.execute("SELECT * from music_played order by date_played desc limit 1")
 print("result of query")
