@@ -6,7 +6,7 @@ import tempfile
 
 #tmpdir = tempfile.mkdtemp()
 rdsctl = os.path.join('/tmp','rds_ctl')
-dbpath="/srv/media/radio"
+dbpath="/var/opt/radio"
 last_song=''
 if not os.path.exists(rdsctl):
 #    os.remove(rdsctl)
