@@ -12,11 +12,11 @@ if not os.path.exists(rdsctl):
 #    os.remove(rdsctl)
     os.mkfifo(rdsctl)
 fifo=open(rdsctl,"w",1)
-texto="RADIOVROCK FM   "
+texto="RADIOVROCK FM  "
 c=0
 size=8
 jump=2
-sleep=4
+sleep=10
 #completa texto com marquee de final
 length = len(texto)
 texto=texto

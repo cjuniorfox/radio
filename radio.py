@@ -1,11 +1,5 @@
 #!/usr/bin/python
-import os
-import stat
-import random
-import subprocess
-import sqlite3
-import requests
-import re
+import os,  random, subprocess, sqlite3,requests, time, re
 from datetime import datetime
 from listfiles import listfiles
 
@@ -13,8 +7,8 @@ audioext = ('.mp3','.m4a')
 downloadvozdobrasil = "https://redenacionalderadio.com.br/programas/a-voz-do-brasil-download"
 path="/srv/media/radio/music"
 dbpath="/srv/media/radio"
-audiohw="hw:0,0"
 hw="dmix:CARD=Loopback,DEV=0"
+overlap=3 #Overlap time between songs. Only available if not piping the output
 #Define if the broadcast will use hardware (can be snd_aloop) or thought a fifo
 usehw=True 
 broadfifo=os.path.join('/tmp','broadcast') #Broadcast file (used only if usehw is false
@@ -31,6 +25,9 @@ def regsongname(song_name):
         c.execute("UPDATE music_played set plays=plays+1,date_played=current_timestamp where song_name=?",(song_name,))
     con.commit()
 
+# @media - Media file or url
+# @songname - Name of song to register
+# @waittime - Time to sleep before retorning function as done
 def playffmpeg(media,songname):
     try:
         regsongname(songname)
@@ -41,15 +38,11 @@ def playffmpeg(media,songname):
         cmdffmpeg.append("-filter_complex")
         cmdffmpeg.append(filtercomplex)
     print("["+datetime.today().strftime("%d/%m/%Y - %H:%M:%S"+"]")+" Song: "+songname.encode("UTF-8"))
-    aplaycmd = ["aplay","-D",audiohw,"--quiet"]
     if usehw: #If alsahw was used, output to alsa
         cmdffmpeg.append("-f")
         cmdffmpeg.append("alsa")
         cmdffmpeg.append(hw)
         psffmpeg = subprocess.Popen(cmdffmpeg)
-        #psaplay = subprocess.Popen(aplaycmd,stdin=psffmpeg.stdout,stdout=subprocess.PIPE)
-        psffmpeg.wait()
-        #print(psaplay.communicate()[0])
     else: #pipe ffmpeg to fifo
         if not os.path.exists(broadfifo):
             os.mkfifo(broadfifo)
@@ -59,13 +52,28 @@ def playffmpeg(media,songname):
         except Exception:
             print("Unable to write to broadpipe")
         psffmpeg = subprocess.Popen(cmdffmpeg,stdout=broadcast)
-        psffmpeg.wait()
-    #psffmpeg.stdout.close()
-    #print(psaplay.communicate()[0])
+    return psffmpeg
     
+def getsonglength(media):
+    c = ['ffprobe','-v','error','-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', media]
+    proc = subprocess.Popen(c,stdout=subprocess.PIPE)
+    return proc.stdout.read()
+
+#Overlap only works using downmix hardware and not overlapping
+def playoverlapping(media,songname):
+    psffmpeg = playffmpeg(media,songname)
+    if(usehw and overlap > 0):
+        length = getsonglength(media)
+        if (length is not None):
+            time.sleep(float(length) - overlap) #sleep manually and freed the routine to start another song
+        else:
+            psffmpeg.wait()
+    else:
+        psffmpeg.wait()
+
 def vozdobrasil():
     if datetime.today().weekday() in range(0,4) and datetime.now().strftime("%H")=="21": #Verifica se eh dia util e a hora
-        print("Voz do brasil")
+        print("Iniciando transmissao da Voz do brasil")
         today=datetime.today()
         strtoday=today.strftime("%d-%m-%y")
         try:
@@ -74,11 +82,12 @@ def vozdobrasil():
             for line in lines:
                 if re.search(strtoday,line):
                     vozlink=line.split("\"")[1]
-                    print(vozlink)
+                    print("link: "+vozlink)
                     if vozlink is not None:
-                        playffmpeg(vozlink,"A Voz do Brasil")
+                        ps = playffmpeg(vozlink,"A Voz do Brasil")
+                        ps.wait()
         except Exception:
-            print('Unable to reach the internet') 
+            print('Nao foi possivel transmitir a voz do brasil') 
 
 
 con= sqlite3.connect(os.path.join(dbpath,"radio.db"))
@@ -97,4 +106,4 @@ while ( True ): #infinite loop
         vozdobrasil()
         songname = file.rsplit('/',1)[1].decode('utf-8').replace('.m4a','').replace('.mp3','')
         if os.path.isfile(file):
-            playffmpeg(file,songname)
+            playoverlapping(file,songname)
