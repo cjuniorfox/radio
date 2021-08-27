@@ -16,4 +16,4 @@ cp rds_song.service /etc/systemd/system
 cp fm.service /etc/systemd/system
 
 systemctl enable radio rds_song fm
-systemctl start radio rds_song fm
+#systemctl start radio rds_song fm

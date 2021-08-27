@@ -39,10 +39,10 @@ while(True):
 	if(last_song != song_name):
 	    last_song=song_name
 	    command = "RT "+song_name.encode("UTF-8")
-	else:
-	    command = "PS "+marquee
-        try:
-            fifo.write(command+"\n")
-        except Exception:
-            print("Unable to write to named pipe") 
+#	else:
+#	    command = "PS "+marquee
+            try:
+                fifo.write(command+"\n")
+            except Exception:
+                print("Unable to write to named pipe") 
 	time.sleep(sleep)
