@@ -31,7 +31,7 @@ def regsongname(song_name):
 def playffmpeg(media,songname):
     try:
         regsongname(songname)
-    except E:
+    except Exception:
         print("Unable to update song name")
     cmdffmpeg = ["ffmpeg","-i",media,"-loglevel","error","-f","wav","-bitexact", "-acodec", "pcm_s16le", "-ar", "48000", "-ac", "2"];
     if filtercomplex is not None:
@@ -72,7 +72,8 @@ def playoverlapping(media,songname):
         psffmpeg.wait()
 
 def vozdobrasil():
-    if datetime.today().weekday() in range(0,4) and datetime.now().strftime("%H")=="21": #Verifica se eh dia util e a hora
+        #verifica se eh dia de semana (0 a 4) e se sao 21h
+        if datetime.today().weekday() in range(0,5) and datetime.now().strftime("%H")=="21": #Verifica se eh dia util e a hora
         print("Iniciando transmissao da Voz do brasil")
         today=datetime.today()
         strtoday=today.strftime("%d-%m-%y")
