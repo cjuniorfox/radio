@@ -73,7 +73,7 @@ def playoverlapping(media,songname):
 
 def vozdobrasil():
         #verifica se eh dia de semana (0 a 4) e se sao 21h
-        if datetime.today().weekday() in range(0,5) and datetime.now().strftime("%H")=="21": #Verifica se eh dia util e a hora
+    if datetime.today().weekday() in range(0,5) and datetime.now().strftime("%H")=="21": #Verifica se eh dia util e a hora
         print("Iniciando transmissao da Voz do brasil")
         today=datetime.today()
         strtoday=today.strftime("%d-%m-%y")

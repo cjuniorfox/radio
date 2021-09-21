@@ -8,8 +8,8 @@ import time
 from datetime import datetime
 
 freq="91.5"
-ps="VROCK FM"
-rt="RADIOVROCK FM"
+ps=""
+rt=""
 fm=None
 sleeptime= 3600 * 2 #horas
 usehw=True
